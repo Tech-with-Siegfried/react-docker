@@ -1,70 +1,101 @@
-# Getting Started with Create React App
+# React Docker Example: 5‑minute crash course
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository accompanies a short Tech with Siegfried YouTube video that teaches the basics of Docker in about five minutes. It includes a very simple React application, a Dockerfile that builds the app into a container image and a command.txt file that lists the commands shown in the video. 
 
-## Available Scripts
+Link to Video: 
 
-In the project directory, you can run:
+## What is Docker?
 
-### `npm start`
+Docker is the most popular platform for packaging and running applications in containers. Containers are lightweight isolated units that run on top of the host operating system’s kernel, in contrast to virtual machines which run a full guest operating system with its own kernel. Because containers share the underlying kernel but remain sandboxed from other processes, they are far smaller and faster to start than VMs. A single container holds your application code, its dependencies and environment configuration, meaning it will run the same way on your laptop, a colleague’s machine or a production server. This eliminates the classic “it works on my machine” problem and simplifies deployment.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Docker uses a few key building blocks:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Concept     | Description |
+|-------------|-------------|
+| **Dockerfile** | A text file with instructions that tell Docker how to build an image of your application. Typical instructions include selecting a base image (FROM), setting a working directory, copying files, installing dependencies and defining the command to run the app. |
+| **Image** | A read‑only template built from a Dockerfile. Images are based on a base image (for example, `node:18-alpine`) and capture your app code and dependencies. They can be pulled from a registry such as Docker Hub or built locally. |
+| **Container** | A running instance of an image. When you execute `docker run`, Docker creates a container using the image and isolates it from other processes on your host. |
 
-### `npm test`
+## Repository structure
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+.
+├── src/               # React application source code
+├── public/            # Static assets for React (HTML template, icons etc.)
+├── Dockerfile         # Instructions for building the container image
+├── package.json       # NPM dependencies and scripts for the React app
+├── command.txt        # Shell commands used in the video
+└── README.md          # This readme
+```
 
-### `npm run build`
+## command.txt
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The `command.txt` file contains the terminal commands demonstrated in the video. Each line is annotated in the video, but having them here makes it easy to copy and paste. The commands include:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Pulling and running the official hello‑world image (`docker pull hello-world` and `docker run hello-world`). These commands demonstrate that you can download an image from Docker Hub and run a container immediately. In fact, you do not need to run `docker pull` explicitly because `docker run` will pull the image if it cannot be found locally.
+- Building the React app image using your Dockerfile (`docker build -t react-test:v1 .`), tagging it with a custom name and version.
+- Running the image in detached mode and mapping a host port to the container port (`docker run -d -p 3000:3000 react-test:v1`).
+- Rebuilding the image after making changes (`docker build -t react-test:v2 .`) and running the new version on a different port (`docker run -d -p 3001:3000 react-test:v2`). This shows how multiple versions of your app can coexist as separate containers.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Running the React app locally
 
-### `npm run eject`
+You can run the React application directly on your machine without Docker. This is useful for development before you containerize it:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Clone this repository:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+git clone https://github.com/your-username/react-docker-example.git
+cd react-docker-example
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Install dependencies:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm install
+```
 
-## Learn More
+Start the development server:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The app should be available at [http://localhost:3000](http://localhost:3000).
 
-### Code Splitting
+## Dockerizing the React app
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The provided Dockerfile is based on an official Node.js runtime (`node:18-alpine`) and builds a production version of the React app. Here is a breakdown of each instruction:
 
-### Analyzing the Bundle Size
+- **Base image**: `FROM node:18-alpine` tells Docker to start from a lightweight Alpine Linux image with Node.js preinstalled.
+- **Working directory**: `WORKDIR /app` sets the working directory inside the container.
+- **Install dependencies**: `COPY package*.json ./` followed by `RUN npm install` copies only the package files and installs dependencies. This step is cached so that dependency installation is not repeated when only your source code changes.
+- **Copy application code**: `COPY . .` copies the rest of your source files into the container.
+- **Expose port**: `EXPOSE 3000` indicates that the app listens on port 3000.
+- **Start command**: `CMD ["npm", "start"]` runs the start script defined in `package.json` when the container launches.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Build and run the image
 
-### Making a Progressive Web App
+Use the following commands from the repository root to build and run your containerized React app:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+# Build the container image and tag it as react-test:v1
+docker build -t react-test:v1 .
 
-### Advanced Configuration
+# Run the container in detached mode (-d) and map your host’s port 3000 to the container’s port 3000
+docker run -d -p 3000:3000 react-test:v1
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Visit [http://localhost:3000](http://localhost:3000) in your browser to see the app running inside a container.
 
-### Deployment
+You can iterate on your code by changing files, tagging a new version and running it on a different port. For example:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+docker build -t react-test:v2 .
+docker run -d -p 3001:3000 react-test:v2
+```
 
-### `npm run build` fails to minify
+## Feedback and contributions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This repository was created as part of a YouTube tutorial using some AI assistance. Feel free to star the repository if you find it helpful, open an issue if you spot a problem or submit a pull request if you would like to improve the example. Suggestions for future topics whether programming languages, frameworks, DevOps practices or general programming advice are very welcome to be left in the comments of the video.
+
+You can also leave feedback in the comments section of the video. Thank you for watching and see you next time on Tech with Siegfried.
