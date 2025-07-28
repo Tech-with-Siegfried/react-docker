@@ -2,7 +2,7 @@
 
 This repository accompanies a short Tech with Siegfried YouTube video that teaches the basics of Docker in about five minutes. It includes a very simple React application, a Dockerfile that builds the app into a container image and a command.txt file that lists the commands shown in the video. 
 
-Link to Video: https://www.youtube.com/watch?v=iG-lErIM5hI
+Link to the Video: https://www.youtube.com/watch?v=iG-lErIM5hI
 
 ## What is Docker?
 
