@@ -2,7 +2,7 @@
 
 This repository accompanies a short Tech with Siegfried YouTube video that teaches the basics of Docker in about five minutes. It includes a very simple React application, a Dockerfile that builds the app into a container image and a command.txt file that lists the commands shown in the video. 
 
-Link to Video: 
+Link to Video: https://www.youtube.com/watch?v=iG-lErIM5hI
 
 ## What is Docker?
 
@@ -32,10 +32,10 @@ Docker uses a few key building blocks:
 
 The `command.txt` file contains the terminal commands demonstrated in the video. Each line is annotated in the video, but having them here makes it easy to copy and paste. The commands include:
 
-- Pulling and running the official hello‑world image (`docker pull hello-world` and `docker run hello-world`). These commands demonstrate that you can download an image from Docker Hub and run a container immediately. In fact, you do not need to run `docker pull` explicitly because `docker run` will pull the image if it cannot be found locally.
 - Building the React app image using your Dockerfile (`docker build -t react-test:v1 .`), tagging it with a custom name and version.
 - Running the image in detached mode and mapping a host port to the container port (`docker run -d -p 3000:3000 react-test:v1`).
 - Rebuilding the image after making changes (`docker build -t react-test:v2 .`) and running the new version on a different port (`docker run -d -p 3001:3000 react-test:v2`). This shows how multiple versions of your app can coexist as separate containers.
+- Listing all running docker containers (`docker ps`) and stoping a specific container (`docker stop [CONTAINER-NAME]`)
 
 ## Running the React app locally
 
